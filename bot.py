@@ -9,7 +9,7 @@ chat_id = os.getenv("CHAT_ID")
 
 def run():
     # Используем бесплатную модель Flash
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-pro')
     
     # 1. Генерируем текст факта
     prompt = "Напиши один короткий, шокирующий факт о мире на русском языке. Используй эмодзи. Сделай текст интересным для молодежи."
