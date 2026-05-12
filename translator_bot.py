@@ -2,50 +2,52 @@ import os
 import telebot
 import requests
 
-# Подтягиваем секреты из GitHub Actions
 TOKEN = os.getenv('BOT_TOKEN')
 GEMINI_KEY = os.getenv('GEMINI_KEY')
 
 bot = telebot.TeleBot(TOKEN)
 
+def get_working_model():
+    """Автоматически находит рабочую модель Gemini"""
+    list_url = f"https://generativelanguage.googleapis.com/v1beta/models?key={GEMINI_KEY}"
+    try:
+        res = requests.get(list_url).json()
+        for m in res.get('models', []):
+            # Ищем модель, которая умеет генерировать контент и не является 'vision'
+            if 'generateContent' in m.get('supportedGenerationMethods', []) and 'vision' not in m['name']:
+                return m['name']
+        return "models/gemini-1.5-flash" # Запасной вариант
+    except:
+        return "models/gemini-1.5-flash"
+
 def get_ai_translation(text):
-    # Используем v1beta и модель gemini-1.5-flash (самая стабильная сейчас)
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_KEY}"
+    model_name = get_working_model()
+    url = f"https://generativelanguage.googleapis.com/v1beta/{model_name}:generateContent?key={GEMINI_KEY}"
     
     data = {
         "contents": [{
-            "parts": [{"text": f"Ты — профессиональный переводчик. Переведи текст: '{text}'. Если он на русском — на английский, если на английском — на русский. Пиши ТОЛЬКО текст перевода, без лишних слов."}]
+            "parts": [{"text": f"Переведи текст на противоположный язык (рус/англ): '{text}'. Пиши ТОЛЬКО перевод."}]
         }]
     }
 
     try:
         response = requests.post(url, json=data, timeout=10)
         res_json = response.json()
-
-        # Проверка на успешный ответ
         if "candidates" in res_json:
             return res_json['candidates'][0]['content']['parts'][0]['text']
-        
-        # Если что-то не так, выводим техническую инфу (для нас)
-        return f"⚠ Ошибка Google API: {res_json.get('error', {}).get('message', 'Неизвестная ошибка')}"
-    
+        return f"⚠ Ошибка API: {str(res_json)}"
     except Exception as e:
         return f"❌ Ошибка связи: {str(e)}"
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    bot.reply_to(message, "Здорово! Я твой личный ИИ-переводчик. 🌍\nПросто напиши мне фразу, и я её переведу.")
+    bot.reply_to(message, "Бот запущен в режиме авто-подбора модели! Пиши фразу.")
 
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
-    # Отправляем временное сообщение, чтобы юзер не думал, что бот завис
-    status_msg = bot.reply_to(message, "⏳ Перевожу...")
-    
+    status_msg = bot.reply_to(message, "⏳ Подключаюсь к лучшему серверу Google...")
     translation = get_ai_translation(message.text)
-    
-    # Редактируем то самое временное сообщение, вставляя перевод
     bot.edit_message_text(translation, chat_id=message.chat.id, message_id=status_msg.message_id)
 
 if __name__ == '__main__':
-    print("Бот запущен...")
     bot.polling(none_stop=True)
