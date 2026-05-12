@@ -3,7 +3,7 @@ import telebot
 import requests
 
 # Вставь сюда токен, который тебе дал @BotFather
-TOKEN ='8940019675:AAFW_sPDEYI5bhTnhXQLu41dha1GjYOAucw'
+TOKEN ='8940019675:AAFw_sPDEYI5bhTnhXQLu41dhalGjYOAucw'
 GEMINI_KEY = os.getenv("GEMINI_API_KEY")
 
 bot = telebot.TeleBot(TOKEN)
