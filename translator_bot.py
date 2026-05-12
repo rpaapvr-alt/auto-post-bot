@@ -2,50 +2,50 @@ import os
 import telebot
 import requests
 
-# Вставь сюда токен, который тебе дал @BotFather
-TOKEN ='8940019675:AAFw_sPDEYI5bhTnhXQLu41dhalGjYOAucw'
-GEMINI_KEY = ("AIzaSyBDT_-Grx3oRArUSTogea0jjknme-5ST-E")
+# ТВОИ ДАННЫЕ (ВСТАВЬ СВОЙ НОВЫЙ КЛЮЧ ТУТ)
+TOKEN = '8940019675:AAfW_sPDEYI5bhTnhXQLu41dhalGjYOAucw'
+GEMINI_KEY = "ВСТАВЬ_СЮДА_НОВЫЙ_КЛЮЧ_ИЗ_AI_STUDIO"
 
 bot = telebot.TeleBot(TOKEN)
 
 def get_ai_translation(text):
-    # Используем актуальную модель Gemini
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={GEMINI_KEY}"
+    # Используем v1beta эндпоинт
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_KEY}"
     
-    # Промпт для качественного перевода
-    prompt = (
-        f"Ты — профессиональный ИИ-переводчик. Твоя задача: "
-        f"1. Если текст на русском — переведи его на английский. "
-        f"2. Если текст на английском — переведи его на русский. "
-        f"Переводи художественно и грамотно. "
-        f"Текст для перевода: '{text}'"
-    )
-    
-    payload = {"contents": [{"parts":[{"text": prompt}]}]}
-    
-    try:
-        res = requests.post(url, json=payload)
-        res_data = res.json()
-        # Извлекаем только текст перевода
-        return res_data['candidates'][0]['content']['parts'][0]['text'].strip()
-    except Exception as e:
-        print(f"Ошибка Gemini: {e}")
-        return "Уппс, нейронка занята. Попробуй через минуту! 🤖"
+    data = {
+        "contents": [{
+            "parts": [{"text": f"Ты — профессиональный ИИ-переводчик. Переведи текст художественно и грамотно. Если текст на русском — на английский, если на английском — на русский. Текст: '{text}'"}]
+        }]
+    }
 
-# Ответ на команду /start
+    try:
+        response = requests.post(url, json=data, timeout=10)
+        res_json = response.json()
+
+        # Проверка на ошибки от самого Google
+        if "error" in res_json:
+            error_msg = res_json['error'].get('message', 'Unknown Error')
+            return f"Ошибка Google API: {error_msg}"
+
+        # Парсим ответ
+        return res_json['candidates'][0]['content']['parts'][0]['text']
+    
+    except Exception as e:
+        return f"Ошибка подключения/кода: {str(e)}"
+
 @bot.message_handler(commands=['start'])
 def start(message):
-    bot.reply_to(message, "Здорово! Я твой личный ИИ-переводчик. 🌍\nПросто напиши мне фразу на русском или английском, и я её переведу.")
+    bot.reply_to(message, "Здорово! Я твой личный ИИ-переводчик. 🌍\nПросто напиши мне фразу, и я её переведу.")
 
-# Обработка всех входящих сообщений
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
-    # Бот показывает статус "печать", чтобы было понятно, что он думает
-    bot.send_chat_action(message.chat.id, 'typing')
+    # Чтобы юзер видел, что бот думает
+    msg = bot.reply_to(message, "Думаю...")
     
-    result = get_ai_translation(message.text)
-    bot.reply_to(message, result)
+    translation = get_ai_translation(message.text)
+    
+    bot.edit_message_text(translation, chat_id=message.chat.id, message_id=msg.message_id)
 
-if __name__ == "__main__":
-    print("Бот-переводчик запущен и ждет сообщений...")
-    bot.infinity_polling()
+if __name__ == '__main__':
+    print("Бот запущен...")
+    bot.polling(none_stop=True)
