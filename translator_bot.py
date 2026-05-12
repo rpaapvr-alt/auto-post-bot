@@ -4,7 +4,7 @@ import requests
 
 # Вставь сюда токен, который тебе дал @BotFather
 TOKEN ='8940019675:AAFw_sPDEYI5bhTnhXQLu41dhalGjYOAucw'
-GEMINI_KEY = ("AIzaSyCzRZzV-rC14KYXOrgvWc5WdqpRGkamqMY")
+GEMINI_KEY = ("AIzaSyBDT_-Grx3oRArUSTogea0jjknme-5ST-E")
 
 bot = telebot.TeleBot(TOKEN)
 
