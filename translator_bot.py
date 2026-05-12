@@ -2,15 +2,15 @@ import os
 import telebot
 import requests
 
-# ТВОИ ДАННЫЕ (ВСТАВЬ СВОЙ НОВЫЙ КЛЮЧ ТУТ)
-TOKEN = '8940019675:AAGojwCM2sTvuTBOAk1XiIeFJgFSwxCxLxw'
-GEMINI_KEY = "AIzaSyBDT_-Grx3oRArUSTogea0jjknme-5ST-E"
+# ТВОИ ДАННЫЕ (ВСТАВЬ СВОИ КЛЮЧИ ТУТ)
+TOKEN = '8940019675:AAfW_sPDEYI5bhTnhXQLu41dhalGjYOAucw'
+GEMINI_KEY = "ВСТАВЬ_СЮДА_СВОЙ_КЛЮЧ_GEMINI"
 
 bot = telebot.TeleBot(TOKEN)
 
 def get_ai_translation(text):
-    # Используем v1beta эндпоинт
-   url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={GEMINI_KEY}"
+    # Используем стабильный эндпоинт с авто-выбором модели
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={GEMINI_KEY}"
     
     data = {
         "contents": [{
@@ -22,16 +22,16 @@ def get_ai_translation(text):
         response = requests.post(url, json=data, timeout=10)
         res_json = response.json()
 
-        # Проверка на ошибки от самого Google
+        # Проверка ошибок от Google
         if "error" in res_json:
             error_msg = res_json['error'].get('message', 'Unknown Error')
             return f"Ошибка Google API: {error_msg}"
 
-        # Парсим ответ
+        # Возвращаем перевод
         return res_json['candidates'][0]['content']['parts'][0]['text']
     
     except Exception as e:
-        return f"Ошибка подключения/кода: {str(e)}"
+        return f"Ошибка кода: {str(e)}"
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -39,12 +39,14 @@ def start(message):
 
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
-    # Чтобы юзер видел, что бот думает
-    msg = bot.reply_to(message, "Думаю...")
+    # Сначала отвечаем, что бот думает
+    thinking_msg = bot.reply_to(message, "Думаю...")
     
+    # Получаем перевод
     translation = get_ai_translation(message.text)
     
-    bot.edit_message_text(translation, chat_id=message.chat.id, message_id=msg.message_id)
+    # Редактируем сообщение "Думаю..." на готовый ответ
+    bot.edit_message_text(translation, chat_id=message.chat.id, message_id=thinking_msg.message_id)
 
 if __name__ == '__main__':
     print("Бот запущен...")
