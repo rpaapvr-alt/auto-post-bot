@@ -41,7 +41,7 @@ def get_ai_translation(text):
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    bot.reply_to(message, "Яна шлюха.")
+    bot.reply_to(message, "Здаров! Пиши фразу, я переведу её.")
 
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
