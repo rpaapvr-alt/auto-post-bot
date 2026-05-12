@@ -10,7 +10,7 @@ bot = telebot.TeleBot(TOKEN)
 
 def get_ai_translation(text):
     # Используем v1beta эндпоинт
-   url = f"[https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=]
+   url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={GEMINI_KEY}"
     
     data = {
         "contents": [{
