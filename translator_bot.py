@@ -3,7 +3,7 @@ import telebot
 import requests
 
 # ТВОИ ДАННЫЕ (ВСТАВЬ СВОЙ НОВЫЙ КЛЮЧ ТУТ)
-TOKEN = '8940019675:AAfW_sPDEYI5bhTnhXQLu41dhalGjYOAucw'
+TOKEN = '8940019675:AAGojwCM2sTvuTBOAk1XiIeFJgFSwxCxLxw'
 GEMINI_KEY = "AIzaSyBDT_-Grx3oRArUSTogea0jjknme-5ST-E"
 
 bot = telebot.TeleBot(TOKEN)
