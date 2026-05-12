@@ -4,7 +4,7 @@ import requests
 
 # ТВОИ ДАННЫЕ (ВСТАВЬ СВОЙ НОВЫЙ КЛЮЧ ТУТ)
 TOKEN = '8940019675:AAfW_sPDEYI5bhTnhXQLu41dhalGjYOAucw'
-GEMINI_KEY = "ВСТАВЬ_СЮДА_НОВЫЙ_КЛЮЧ_ИЗ_AI_STUDIO"
+GEMINI_KEY = "AIzaSyBDT_-Grx3oRArUSTogea0jjknme-5ST-E"
 
 bot = telebot.TeleBot(TOKEN)
 
