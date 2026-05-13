@@ -40,7 +40,7 @@ def run():
         models_data = requests.get(list_url).json()
         model_name = next(m['name'] for m in models_data['models'] if 'generateContent' in m['supportedGenerationMethods'] and 'gemini' in m['name'])
     except:
-        model_name = "model = "gemini-1.5-flash"
+       model_name = "gemini-1.5-flash"
 
     # 3. ЗАПРОС С "ИНЪЕКЦИЕЙ ХАОСА"
     url = f"https://generativelanguage.googleapis.com/v1beta/{model_name}:generateContent?key={api_key}"
